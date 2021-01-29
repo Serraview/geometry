@@ -68,6 +68,8 @@ but there's currently nothing that enforces simplicity.
 	# @param [Point] point	The {Point} to test
 	# @return [Number]	1 if the {Point} is inside the {Polygon}, -1 if it's outside, and 0 if it's on an {Edge}
 	def <=>(point)
+		last_edge = edges.reverse_each.find { |e| (e.last.y <=> e.first.y) != 0 }
+		last_up_down_direction = (last_edge.last.y <=> last_edge.first.y)
 	    winding = edges.reduce(0) do |sum, e|
 		direction = e.last.y <=> e.first.y
 		# Ignore edges that don't cross the point's x coordinate
@@ -78,7 +80,16 @@ but there's currently nothing that enforces simplicity.
 		    next sum	    # Doesn't intersect
 		else
 		    is_left = e <=> point
-		    return 0 if 0 == is_left
+			return 0 if 0 == is_left
+				
+			previous_direction = last_up_down_direction
+			last_up_down_direction = direction
+			# previous edge left at that point should have covered this y 
+			# coordinate
+			if previous_direction == direction && point.y == e.first.y
+				next sum 
+			end
+
 		    next sum unless is_left
 		    sum += 0 <=> (direction + is_left)
 		end

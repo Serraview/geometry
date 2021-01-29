@@ -126,6 +126,12 @@ describe Geometry::Polygon do
 	it "with a Point that lies on a horizontal edge" do
 	    (unit_square <=> Point[0.5,0]).must_equal 0
 	end
+
+	it "with a Point that lies on a y coordinate of 2 edges outside of polygon" do
+		# polygon that has 2 edges going up, 1 edge coming down
+		polygon = Polygon.new [0,0], [-1,-1], [0,-2], [2,-2], [2,0]
+		(polygon <=> Point[-2,-1]).must_equal -1
+	end
     end
 
     describe "when outsetting" do
